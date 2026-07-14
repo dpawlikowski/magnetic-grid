@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup, fireEvent, within } from "@testing-library/react";
 import { App } from "./App";
-import { INITIAL_CONTROLS, estimatePointCount } from "./gridControls";
+import { GITHUB_REPO_URL, INITIAL_CONTROLS, estimatePointCount } from "./gridControls";
 
 // jsdom has no 2D canvas backend; the grid guards on a null context and no-ops.
 vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
@@ -49,5 +49,54 @@ describe("<App> (magnetic-grid demo)", () => {
       INITIAL_CONTROLS.density,
     );
     expect(within(meter).getByText(String(expected))).toBeInTheDocument();
+  });
+
+  it("marks the active preset, variant, and mode buttons with aria-pressed", () => {
+    render(<App />);
+    expect(screen.getByRole("button", { name: /Gravity/ })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: /Neon/ })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    expect(screen.getByRole("button", { name: "Attract" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Repel" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+  });
+
+  it("restores every control to its initial value on reset", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: /Neon/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Repel" }));
+    expect(screen.getByRole("button", { name: /Neon/ })).toHaveClass("active");
+
+    fireEvent.click(screen.getByRole("button", { name: /Reset controls/ }));
+
+    expect(screen.getByRole("button", { name: /Gravity/ })).toHaveClass("chip", "active");
+    expect(screen.getByRole("button", { name: "Attract" })).toHaveClass(
+      "modeButton",
+      "active",
+    );
+  });
+
+  it("links to the project's GitHub repository", () => {
+    render(<App />);
+    const link = screen.getByRole("link", { name: /View source on GitHub/ });
+    expect(link).toHaveAttribute("href", GITHUB_REPO_URL);
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
+  it("shows a placeholder FPS reading until the first animation frame reports in", () => {
+    render(<App />);
+    const meter = screen.getByTitle("Frames per second");
+    expect(within(meter).getByText("—")).toBeInTheDocument();
   });
 });

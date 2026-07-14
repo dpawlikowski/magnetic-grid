@@ -64,6 +64,15 @@ describe("renderGrid", () => {
     expect(ctx.arc).not.toHaveBeenCalled();
   });
 
+  it("draws full-width/height guide lines for the lines variant", () => {
+    const ctx = mockCtx();
+    renderGrid(context("lines", ctx));
+    expect(ctx.moveTo).toHaveBeenCalled();
+    expect(ctx.lineTo).toHaveBeenCalled();
+    expect(ctx.stroke).toHaveBeenCalled();
+    expect(ctx.arc).not.toHaveBeenCalled();
+  });
+
   it("delegates to a custom renderer for the custom variant", () => {
     const ctx = mockCtx();
     const custom = vi.fn();

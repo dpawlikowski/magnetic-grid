@@ -34,6 +34,36 @@ describe("resolveConfig", () => {
     expect(config.density).toBe(CONFIG_LIMITS.density.min);
   });
 
+  it("ignores explicit undefined props instead of letting them clobber defaults/presets", () => {
+    // Regression: <MagneticGrid> forwards every config key to resolveConfig,
+    // `undefined` or not (it never omits unset props). A naive
+    // `{ ...defaultConfig, ...preset, ...props }` spread keeps those explicit
+    // `undefined`s, wiping out the default/preset value they were meant to
+    // fall back to (and NaN-ing every clamped numeric field in the process).
+    const allKeysUndefined = resolveConfig({
+      background: undefined,
+      color: undefined,
+      damping: undefined,
+      density: undefined,
+      dotSize: undefined,
+      falloff: undefined,
+      ghostCursor: undefined,
+      interactive: undefined,
+      lineWidth: undefined,
+      mode: undefined,
+      preset: "neon",
+      radius: undefined,
+      respectReducedMotion: undefined,
+      returnSpeed: undefined,
+      strength: undefined,
+      variant: undefined,
+    });
+
+    expect(allKeysUndefined).toEqual(resolveConfig({ preset: "neon" }));
+    expect(Number.isNaN(allKeysUndefined.density)).toBe(false);
+    expect(allKeysUndefined.color).toBe(presets.neon.color);
+  });
+
   it("keeps every limit's min below its max", () => {
     for (const { min, max } of Object.values(CONFIG_LIMITS)) {
       expect(min).toBeLessThan(max);

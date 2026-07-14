@@ -1,17 +1,32 @@
-import { Activity, CircleDot, Grid3X3, Move, Sparkles, Waves } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  Activity,
+  CircleDot,
+  Gauge,
+  Github,
+  Grid3X3,
+  Move,
+  RotateCcw,
+  Sparkles,
+  Waves,
+} from "lucide-react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { MagneticGrid } from "../MagneticGrid";
 import type {
+  FrameStats,
   MagneticGridMode,
   MagneticGridPreset,
   MagneticGridVariant,
 } from "../core/types";
 import {
   GHOST_CURSOR_SPEED,
+  GITHUB_REPO_URL,
   INITIAL_CONTROLS,
   SLIDER_RANGES,
   estimatePointCount,
 } from "./gridControls";
+
+/** How often (ms) the throttled FPS readout is allowed to re-render. */
+const FPS_UPDATE_INTERVAL_MS = 500;
 
 const presetOptions: MagneticGridPreset[] = ["silk", "gravity", "neon", "calm"];
 const variantOptions: Array<{
@@ -66,6 +81,7 @@ export function App() {
   const [radius, setRadius] = useState(INITIAL_CONTROLS.radius);
   const [strength, setStrength] = useState(INITIAL_CONTROLS.strength);
   const [density, setDensity] = useState(INITIAL_CONTROLS.density);
+  const [fps, setFps] = useState<number | null>(null);
 
   const pointEstimate = useMemo(() => {
     if (typeof window === "undefined") {
@@ -74,6 +90,30 @@ export function App() {
 
     return estimatePointCount(window.innerWidth, window.innerHeight, density);
   }, [density]);
+
+  // Sampled and throttled here (rather than in state per-frame) so the FPS
+  // readout never forces the demo to re-render 60 times a second.
+  const fpsSampleRef = useRef({ frames: 0, elapsedMs: 0 });
+  const handleFrame = useCallback(({ delta }: FrameStats) => {
+    const sample = fpsSampleRef.current;
+    sample.frames += 1;
+    sample.elapsedMs += delta;
+
+    if (sample.elapsedMs >= FPS_UPDATE_INTERVAL_MS) {
+      setFps(Math.round((sample.frames * 1000) / sample.elapsedMs));
+      sample.frames = 0;
+      sample.elapsedMs = 0;
+    }
+  }, []);
+
+  const handleReset = () => {
+    setPreset(INITIAL_CONTROLS.preset);
+    setVariant(INITIAL_CONTROLS.variant);
+    setMode(INITIAL_CONTROLS.mode);
+    setRadius(INITIAL_CONTROLS.radius);
+    setStrength(INITIAL_CONTROLS.strength);
+    setDensity(INITIAL_CONTROLS.density);
+  };
 
   return (
     <main className="app">
@@ -86,6 +126,7 @@ export function App() {
         strength={strength}
         density={density}
         ghostCursor={{ enabled: true, speed: GHOST_CURSOR_SPEED }}
+        onFrame={handleFrame}
       />
 
       <section className="panel" aria-label="Magnetic grid controls">
@@ -94,9 +135,34 @@ export function App() {
             <p>magnetic-grid</p>
             <h1>Canvas field playground</h1>
           </div>
-          <div className="meter" title="Estimated points">
-            <Activity size={16} aria-hidden="true" />
-            <span>{pointEstimate}</span>
+          <div className="headerActions">
+            <div className="meter" title="Estimated points">
+              <Activity size={16} aria-hidden="true" />
+              <span>{pointEstimate}</span>
+            </div>
+            <div className="meter" title="Frames per second">
+              <Gauge size={16} aria-hidden="true" />
+              <span>{fps === null ? "—" : fps}</span>
+            </div>
+            <button
+              className="iconButton"
+              type="button"
+              title="Reset to defaults"
+              aria-label="Reset controls to defaults"
+              onClick={handleReset}
+            >
+              <RotateCcw size={16} aria-hidden="true" />
+            </button>
+            <a
+              className="iconButton"
+              href={GITHUB_REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="View source on GitHub"
+              aria-label="View source on GitHub"
+            >
+              <Github size={16} aria-hidden="true" />
+            </a>
           </div>
         </header>
 
@@ -106,6 +172,7 @@ export function App() {
               className={option === preset ? "chip active" : "chip"}
               key={option}
               type="button"
+              aria-pressed={option === preset}
               onClick={() => setPreset(option)}
             >
               <Sparkles size={15} aria-hidden="true" />
@@ -124,6 +191,7 @@ export function App() {
                 key={option.value}
                 type="button"
                 title={option.label}
+                aria-pressed={option.value === variant}
                 onClick={() => setVariant(option.value)}
               >
                 <Icon size={17} aria-hidden="true" />
@@ -137,6 +205,7 @@ export function App() {
           <button
             className={mode === "attract" ? "modeButton active" : "modeButton"}
             type="button"
+            aria-pressed={mode === "attract"}
             onClick={() => setMode("attract")}
           >
             <Move size={16} aria-hidden="true" />
@@ -145,6 +214,7 @@ export function App() {
           <button
             className={mode === "repel" ? "modeButton active" : "modeButton"}
             type="button"
+            aria-pressed={mode === "repel"}
             onClick={() => setMode("repel")}
           >
             <Move size={16} aria-hidden="true" />

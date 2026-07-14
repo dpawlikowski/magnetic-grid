@@ -2,6 +2,7 @@ export { MagneticGrid } from "./MagneticGrid";
 export { defaultConfig, presets, resolveConfig } from "./core/presets";
 export type {
   CustomRenderer,
+  FrameStats,
   GhostCursorOptions,
   GridEdge,
   GridPoint,

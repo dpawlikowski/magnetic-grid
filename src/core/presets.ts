@@ -100,7 +100,14 @@ export const resolveConfig = (
   props: Partial<MagneticGridConfig> & { preset?: MagneticGridPreset },
 ): MagneticGridConfig => {
   const preset = props.preset ? presets[props.preset] : undefined;
-  const merged = { ...defaultConfig, ...preset, ...props };
+  // `MagneticGrid` always forwards every config key, `undefined` or not.
+  // A plain `{ ...defaultConfig, ...preset, ...props }` spread would let
+  // those explicit `undefined`s clobber the default/preset values, so drop
+  // them before merging.
+  const definedProps = Object.fromEntries(
+    Object.entries(props).filter(([, value]) => value !== undefined),
+  ) as Partial<MagneticGridConfig>;
+  const merged = { ...defaultConfig, ...preset, ...definedProps };
 
   return {
     ...merged,

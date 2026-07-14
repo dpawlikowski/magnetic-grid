@@ -70,12 +70,23 @@ export type RenderContext = {
 
 export type CustomRenderer = (context: RenderContext) => void;
 
+export type FrameStats = {
+  /** `requestAnimationFrame` timestamp for this frame, in ms. */
+  time: number;
+  /** Milliseconds since the previous frame (0 on the very first frame). */
+  delta: number;
+  /** Number of points currently in the grid. */
+  pointCount: number;
+};
+
 export type MagneticGridProps = Partial<MagneticGridConfig> & {
   preset?: MagneticGridPreset;
   className?: string;
   style?: CSSProperties;
   renderCustom?: CustomRenderer;
   "aria-label"?: string;
+  /** Called once per animation frame — handy for an FPS readout or other telemetry. */
+  onFrame?: (stats: FrameStats) => void;
 };
 
 export type CanvasSize = {

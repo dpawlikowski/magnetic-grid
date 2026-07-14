@@ -70,6 +70,14 @@ button {
   gap: 14px;
 }
 
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .panelHeader p,
 .panelHeader h1 {
   margin: 0;
@@ -94,15 +102,41 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-width: 76px;
+  min-width: 58px;
   height: 34px;
   justify-content: center;
+  padding: 0 10px;
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 8px;
   color: rgba(238, 244, 255, 0.78);
   background: rgba(255, 255, 255, 0.06);
   font-size: 0.85rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  color: rgba(238, 244, 255, 0.78);
+  background: rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.iconButton:hover,
+.iconButton:focus-visible {
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .buttonGrid {
@@ -148,6 +182,14 @@ button {
 .modeButton:hover {
   border-color: rgba(255, 255, 255, 0.28);
   color: #ffffff;
+}
+
+.chip:focus-visible,
+.segmented button:focus-visible,
+.modeButton:focus-visible,
+.iconButton:focus-visible {
+  outline: 2px solid rgba(116, 226, 255, 0.8);
+  outline-offset: 2px;
 }
 
 .segmented,

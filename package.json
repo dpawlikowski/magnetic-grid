@@ -1,12 +1,20 @@
 {
   "name": "magnetic-grid",
   "version": "0.1.0",
+  "description": "Lightweight, configurable React component that renders an interactive canvas grid reacting to the cursor like a magnetic field.",
   "private": true,
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dpawlikowski/magnetic-grid.git"
+  },
+  "homepage": "https://dpawlikowski.github.io/magnetic-grid/",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:demo": "tsc -b && vite build --config vite.demo.config.ts",
     "preview": "vite preview",
+    "preview:demo": "vite preview --config vite.demo.config.ts",
     "lint": "eslint .",
     "typecheck": "tsc -b",
     "test": "vitest",

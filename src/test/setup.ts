@@ -16,3 +16,16 @@ if (typeof globalThis.requestAnimationFrame === "undefined") {
     setTimeout(() => cb(performance.now()), 0) as unknown as number) as typeof requestAnimationFrame;
   globalThis.cancelAnimationFrame = ((id: number) => clearTimeout(id)) as typeof cancelAnimationFrame;
 }
+
+if (typeof window.matchMedia === "undefined") {
+  window.matchMedia = ((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia;
+}

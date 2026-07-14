@@ -110,6 +110,7 @@ export function MagneticGrid({
   interactive,
   lineWidth,
   mode,
+  onFrame,
   preset,
   radius,
   respectReducedMotion,
@@ -197,6 +198,8 @@ export function MagneticGrid({
     resizeObserver.observe(parent);
     media.addEventListener("change", handleMotionPreference);
 
+    let lastFrameTime = 0;
+
     const tick = (time: number) => {
       const grid = gridRef.current;
       const size = sizeRef.current;
@@ -227,6 +230,15 @@ export function MagneticGrid({
         renderCustom,
       );
 
+      if (onFrame) {
+        onFrame({
+          time,
+          delta: lastFrameTime ? time - lastFrameTime : 0,
+          pointCount: grid.points.length,
+        });
+      }
+      lastFrameTime = time;
+
       frameRef.current = window.requestAnimationFrame(tick);
     };
 
@@ -240,7 +252,7 @@ export function MagneticGrid({
         window.cancelAnimationFrame(frameRef.current);
       }
     };
-  }, [config, renderCustom]);
+  }, [config, onFrame, renderCustom]);
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLCanvasElement>) => {
     if (!config.interactive) {

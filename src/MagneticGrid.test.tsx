@@ -34,4 +34,34 @@ describe("<MagneticGrid>", () => {
     render(<MagneticGrid />);
     expect(screen.getByRole("img")).toHaveStyle({ touchAction: "none" });
   });
+
+  it("reports per-frame stats through onFrame once the animation loop runs", async () => {
+    // Give this mount a real (mock) 2D context so the rAF loop actually
+    // ticks instead of bailing out on the module-level null context.
+    const mockCtx = {
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      arc: vi.fn(),
+      fill: vi.fn(),
+      fillRect: vi.fn(),
+      stroke: vi.fn(),
+      setTransform: vi.fn(),
+    } as unknown as CanvasRenderingContext2D;
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValueOnce(mockCtx);
+
+    const onFrame = vi.fn();
+    render(<MagneticGrid onFrame={onFrame} />);
+
+    await vi.waitFor(() => {
+      expect(onFrame).toHaveBeenCalled();
+    });
+
+    const [stats] = onFrame.mock.calls[0];
+    expect(stats.pointCount).toBeGreaterThan(0);
+    expect(stats.delta).toBe(0); // first frame has no prior timestamp to diff against
+    expect(typeof stats.time).toBe("number");
+  });
 });

@@ -11,6 +11,9 @@ import type {
 /** Angular speed of the auto-orbiting "ghost" cursor when the pointer is idle. */
 export const GHOST_CURSOR_SPEED = 0.00028;
 
+/** Source repository, linked from the demo header. */
+export const GITHUB_REPO_URL = "https://github.com/dpawlikowski/magnetic-grid";
+
 /** Initial control state the playground opens with. */
 export const INITIAL_CONTROLS = {
   preset: "gravity" as MagneticGridPreset,
