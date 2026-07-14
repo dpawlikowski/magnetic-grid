@@ -101,7 +101,7 @@ export const resolveConfig = (
 ): MagneticGridConfig => {
   const preset = props.preset ? presets[props.preset] : undefined;
   const cleanProps = Object.fromEntries(
-    Object.entries(props).filter(([_, value]) => value !== undefined)
+    Object.entries(props).filter(([, value]) => value !== undefined)
   );
   const merged = { ...defaultConfig, ...preset, ...cleanProps } as MagneticGridConfig;
 

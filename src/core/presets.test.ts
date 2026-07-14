@@ -39,4 +39,10 @@ describe("resolveConfig", () => {
       expect(min).toBeLessThan(max);
     }
   });
+
+  it("ignores explicitly provided undefined properties", () => {
+    const config = resolveConfig({ preset: "neon", background: undefined, color: undefined });
+    expect(config.background).toBe(presets.neon.background);
+    expect(config.color).toBe(presets.neon.color);
+  });
 });
